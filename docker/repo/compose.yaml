@@ -1,0 +1,65 @@
+services:
+  alfresco:        
+    image: quay.io/alfresco/alfresco-content-repository:${ALFRESCO_TAG}
+    environment:
+      JAVA_TOOL_OPTIONS: >-
+        -Dencryption.keystore.type=JCEKS
+        -Dencryption.cipherAlgorithm=DESede/CBC/PKCS5Padding
+        -Dencryption.keyAlgorithm=DESede
+        -Dencryption.keystore.location=/usr/local/tomcat/shared/classes/alfresco/extension/keystore/keystore
+        -Dmetadata-keystore.password=mp6yc0UD9e
+        -Dmetadata-keystore.aliases=metadata
+        -Dmetadata-keystore.metadata.password=oKIWzVdEdA
+        -Dmetadata-keystore.metadata.algorithm=DESede
+      JAVA_OPTS: >-
+        -Dcsrf.filter.enabled=false
+        -XX:MinRAMPercentage=50
+        -XX:MaxRAMPercentage=80
+        -Ddb.username=alfresco
+        -Ddb.password=alfresco  
+        -Ddb.driver=org.postgresql.Driver
+        -Ddb.url=jdbc:postgresql://postgres:5432/alfresco
+        -Delasticsearch.createIndexIfNotExists=true
+        -Dindex.subsystem.name=elasticsearch
+        -Delasticsearch.host=os1
+        -Delasticsearch.indexName=${OPENSEARCH_INDEX_NAME}
+        -Delasticsearch.secureComms=mtls
+        -Delasticsearch.ssl.host.name.verification=false
+        -DlocalTransform.core-aio.url=http://transform-core-aio:8090/
+        -Dtransform.service.enabled=true
+        -Dtransform.service.url=http://transform-router:8095
+        -Dsfs.url=http://shared-file-store:8099/
+        -Dmessaging.broker.url="failover:(nio://activemq:61616)?timeout=3000&jms.useCompression=true"
+        -Djavax.net.ssl.keyStore=/usr/local/tomcat/alfresco.keystore
+        -Djavax.net.ssl.keyStorePassword=keystore
+        -Djavax.net.ssl.keyStoreType=PKCS12
+        -Djavax.net.ssl.trustStore=/usr/local/tomcat/alfresco.truststore
+        -Djavax.net.ssl.trustStorePassword=truststore
+        -Djavax.net.ssl.trustStoreType=PKCS12
+        -Dencryption.ssl.truststore.location=/usr/local/tomcat/alfresco.truststore
+        -Dssl-truststore.password=truststore
+        -Dencryption.ssl.truststore.type=PKCS12
+        -Dencryption.ssl.keystore.location=/usr/local/tomcat/alfresco.keystore
+        -Dssl-keystore.password=keystore
+        -Dencryption.ssl.keystore.type=PKCS12
+    depends_on:
+      postgres:      
+        condition: service_healthy
+      os1:
+        condition: service_healthy
+      os2:
+        condition: service_healthy
+    healthcheck:
+        test:
+            - CMD
+            - curl
+            - -f
+            - http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/probes/-ready-
+        interval: 30s
+        timeout: 3s
+        retries: 3
+        start_period: 1m
+    volumes:
+      - ./keystore/alfresco.keystore:/usr/local/tomcat/alfresco.keystore:ro
+      - ./keystore/alfresco.truststore:/usr/local/tomcat/alfresco.truststore:ro
+      - ./mtls-search-enterprise-0.8.0.jar:/usr/local/tomcat/webapps/alfresco/WEB-INF/lib/mtls-search-enterprise-0.8.0.jar

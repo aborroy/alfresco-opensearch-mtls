@@ -1,0 +1,5 @@
+services:
+  activemq:
+    image: docker.io/alfresco/alfresco-activemq:${ACTIVEMQ_TAG}
+    ports:
+      - 8161:8161

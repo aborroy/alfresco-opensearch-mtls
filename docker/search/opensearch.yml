@@ -1,0 +1,5 @@
+plugins.security.authcz.admin_dn:
+  - 'CN=ADMIN,O=HYLAND,L=WESTLAKE,ST=CLE,C=US'
+plugins.security.nodes_dn:
+  - 'CN=os1,O=HYLAND,L=WESTLAKE,ST=CLE,C=US'
+  - 'CN=os2,O=HYLAND,L=WESTLAKE,ST=CLE,C=US'

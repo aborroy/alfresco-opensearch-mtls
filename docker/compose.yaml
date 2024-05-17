@@ -1,0 +1,9 @@
+include:
+  - ./proxy/compose.yaml
+  - ./ui/compose.yaml
+  - ./legacy-ui/compose.yaml
+  - ./repo/compose.yaml
+  - ./messaging/compose.yaml  
+  - ./transform/compose.yaml
+  - ./search/compose.yaml
+  - ./db/compose.yaml
